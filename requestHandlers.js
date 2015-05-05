@@ -3,18 +3,18 @@
 var querystring = require('querystring');
 var fs = require('fs');
 var formidable = require('formidable');
-var util = require ('util');
 
 function start(response) {
   console.log('Request handler "start" was called.');
 
   var body = '<html>'+
     '<head>'+
-    '<meta http-equiv="Content-Type" content="text/html; '+
-    'charset=UTF-8" />'+
+    '<meta http-equiv="Content-Type" '+
+    'content="text/html; charset=UTF-8" />'+
     '</head>'+
     '<body>'+
-    '<form action="/upload" enctype="multipart/form-data method="post">'+
+    '<form action="/upload" enctype="multipart/form-data" ' +
+    'method="post">'+
     '<input type="file" name="upload" multiple="multiple">'+
     '<input type="submit" value="Upload file" />'+
     '</form>'+
@@ -33,14 +33,13 @@ function upload(response, request) {
   console.log('about to parse');
   form.parse(request, function(error, fields, files) {
     console.log('parsing done');
-    console.log(util.inspect({fields: fields, files: files}));
-    //this outputs { fields: {}, files: {} }, not being parsed properly
 
-
-    fs.rename(files.upload.path, './tmp/test.png', function(error) {
+    fs.rename(files.upload.path, '/tmp/test.png', function(error) {
       if (error) {
-        fs.unlink('./tmp/test/png');
-        fs.rename(files.upload.path, './tmp/test.png');
+        fs.unlink('/tmp/test/png', function(error) {
+        });
+        fs.rename(files.upload.path, '/tmp/test.png', function(error) {
+        });
       }
     });
 
@@ -54,7 +53,7 @@ function upload(response, request) {
 function show(response) {
   console.log('Request handler "show" was called.');
   response.writeHead(200, {'Content-Type': 'image/png'});
-  fs.createReadStream('./tmp/test.png').pipe(response);
+  fs.createReadStream('/tmp/test.png').pipe(response);
 }
 
 
